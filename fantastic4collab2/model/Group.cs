@@ -12,6 +12,7 @@ namespace fantastic4collab2.model
         public Group(string name)
         {
             this.Name = name;
+            this.items = new List<Item>();
         }
 
         string Name
