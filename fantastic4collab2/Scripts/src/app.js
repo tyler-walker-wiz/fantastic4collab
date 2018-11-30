@@ -22,14 +22,31 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __importStar(require("react"));
 var ReactDOM = __importStar(require("react-dom"));
-var CommentBox = /** @class */ (function (_super) {
-    __extends(CommentBox, _super);
-    function CommentBox() {
+var WorkItems = /** @class */ (function (_super) {
+    __extends(WorkItems, _super);
+    function WorkItems() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    CommentBox.prototype.render = function () {
-        return (React.createElement("div", { className: "commentBox" }, "Hello, world! I am a CommentBox."));
+    WorkItems.prototype.render = function () {
+        var items = [];
+        items.push({ id: "1", name: "Title", description: "This is a great description" });
+        return (React.createElement("div", null,
+            React.createElement("h2", null, "Welcome to the App"),
+            items.map(function (i) { return React.createElement(WorkItem, { item: i }); })));
     };
-    return CommentBox;
+    return WorkItems;
 }(React.Component));
-ReactDOM.render(React.createElement(CommentBox, null), document.getElementById('app'));
+var WorkItem = /** @class */ (function (_super) {
+    __extends(WorkItem, _super);
+    function WorkItem() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    WorkItem.prototype.render = function () {
+        var item = this.props.item;
+        return (React.createElement("div", { style: { margin: '10px', border: '1px solid gray', backgroundColor: 'lightred' } },
+            React.createElement("div", { className: "commentBox" }, item && item.name),
+            React.createElement("p", null, item && item.description)));
+    };
+    return WorkItem;
+}(React.Component));
+ReactDOM.render(React.createElement(WorkItems, null), document.getElementById('app'));
