@@ -254,6 +254,7 @@
     <Compile Include="model\Group.cs" />
     <Compile Include="model\Item.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\DB_Update.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="package.json" />
