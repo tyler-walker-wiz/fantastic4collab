@@ -7,18 +7,22 @@ namespace fantastic4collab2.model
 {
     public class Group
     {
-        IDictionary<int, Item> items;
+        IDictionary<int, Item> items = new Dictionary<int, Item>();
         
-        public Group()
+        private Group()
         {
-            this.Name = null;
-            this.items = new Dictionary<int, Item>();
         }
 
-        public Group(string name)
+        public Group(int groupID, string name)
         {
+            this.GroupID = groupID;
             this.Name = name;
-            this.items = new Dictionary<int, Item>();
+        }
+
+        public Group(int groupID)
+        {
+            this.GroupID = groupID;
+            this.Name = "";
         }
 
         public string Name

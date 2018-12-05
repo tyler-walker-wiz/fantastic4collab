@@ -7,16 +7,22 @@ namespace fantastic4collab2.model
 {
     public class Item
     {
-        public Item() {
-            // On object construction, upset
-            // If insert, return ID and set.
+        private Item() {
+        }
+
+        public Item(int itemID, string title, string content)
+        {
+            this.ItemID = itemID;
+            this.Title = title;
+            this.Content = content;
             this.Locked = false;
         }
 
-        public Item(string title, string content)
+        public Item(int itemID, string title)
         {
+            this.ItemID = itemID;
             this.Title = title;
-            this.Content = content;
+            this.Content = null;
             this.Locked = false;
         }
 

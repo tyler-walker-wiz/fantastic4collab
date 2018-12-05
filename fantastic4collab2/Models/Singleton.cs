@@ -37,12 +37,7 @@ namespace fantastic4collab2.Models
                         string itemTitle = reader.GetString(3);
                         string itemContent = reader.GetString(4);
 
-                        if (!itemCollection.ContainsKey(groupID))
-                        {
-                            // Create group
-                        }
-
-                        // Add item to group
+                        AddItem(new Group(groupID, groupName), new Item(itemID, itemTitle, itemContent));
                     }
                 }
                 catch (Exception e)
@@ -53,6 +48,8 @@ namespace fantastic4collab2.Models
                 {
                     reader.Close();
                 }
+
+                sqlConnection.Close();
             }
         }
 
@@ -108,10 +105,21 @@ namespace fantastic4collab2.Models
         {
             if (!itemCollection.ContainsKey(groupID))
             {
-                // Create new group
+                Group group = new Group(groupID);
+                AddGroup(group);
             }
 
             itemCollection[groupID].AddItem(item);
+        }
+
+        public void AddItem(Group group, Item item)
+        {
+            if (!itemCollection.ContainsKey(group.GroupID))
+            {
+                AddGroup(group);
+            }
+
+            AddItem(group.GroupID, item);
         }
     }
 }
