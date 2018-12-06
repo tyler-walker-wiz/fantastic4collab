@@ -50,6 +50,11 @@
             $(function () {
                 // Declare a proxy to reference the hub.
                 var chat = $.connection.appHub;
+
+            chat.client.getEverything = function (everything) {
+                console.log("this is the received item: " + everything);
+            }
+
                 // Create a function that the hub can call to broadcast messages.
                 chat.client.broadcastMessage = function (name, message) {
                     // Html encode display name and message.
