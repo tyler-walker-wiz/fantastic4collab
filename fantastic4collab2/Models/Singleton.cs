@@ -121,5 +121,10 @@ namespace fantastic4collab2.Models
 
             AddItem(group.GroupID, item);
         }
+
+        public IDictionary<int, Group> getEverything()
+        {
+            return itemCollection;
+        }
     }
 }
