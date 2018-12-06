@@ -25,7 +25,7 @@ namespace fantastic4collab2.Hubs
 
             Singleton singletonInstance = Singleton.Instance;
 
-            Clients.All.getItem(singletonInstance.GetItem(1, 1));
+            Clients.All.getEverything(singletonInstance.getEverything());
 
             return base.OnConnected();
         }
