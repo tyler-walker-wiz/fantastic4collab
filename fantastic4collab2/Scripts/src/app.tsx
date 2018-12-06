@@ -1,21 +1,40 @@
 ﻿import * as React from 'react';
-import * as ReactDOM from 'react-dom'
+import * as ReactDOM from 'react-dom';
+import { IWorkItem, WorkItem } from './workItem';
+import {BaseReactPageBasicHandleLoad} from './utility/appBase'
 
 
 interface IWorkItemsState {
     items: IWorkItem[];
 }
 
-interface IWorkItem {
-    id: string;
-    name: string;
-    description: string;
-}
-
-class WorkItems extends React.Component<{}, IWorkItemsState>{
-    render() {
-        let items = [];
-        items.push({ id: "1", name: "Title", description: "This is a great description" } as IWorkItem);
+class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
+    async handleLoad() {
+        await setTimeout(() => { }, 1000);
+    }
+    dummyData: IWorkItem[] = [{
+        id: "1",
+        title: "Item 1",
+        content: "Some content"
+    },
+    {
+        id: "2",
+        title: "Item 2",
+        content: "Some revised content"
+    },
+    {
+        id: "3",
+        title: "Item 3",
+        content: "Car"
+    },
+    {
+        id: "4",
+        title: "Item 4",
+        content: "Plane"
+    }];
+    onRender() {
+        let items = this.dummyData;
+        items.push({ id: "5", title: "Title", content: "This is a great description" } as IWorkItem);
         return (<div>
             <h2>Welcome to the App</h2>
             {items.map(i => <WorkItem item={i} />)}
@@ -23,20 +42,5 @@ class WorkItems extends React.Component<{}, IWorkItemsState>{
     }
 }
 
-interface ICommentBoxProps {
-    item: IWorkItem;
-}
-
-class WorkItem extends React.Component<ICommentBoxProps, {}> {
-    render() {
-        let { item } = this.props;
-        return (
-            <div style={{ margin: '10px', padding: '10px', border: '1px solid gray', backgroundColor: 'lightred' }}>
-                <div className="commentBox">{item && item.name}</div>
-                <p>{item && item.description}</p>
-            </div>
-        );
-    }
-}
 
 ReactDOM.render(<WorkItems />, document.getElementById('app'));
