@@ -288,6 +288,7 @@
     <TypeScriptCompile Include="Scripts\src\app.tsx" />
     <TypeScriptCompile Include="Scripts\src\utility\appBase.tsx" />
     <TypeScriptCompile Include="Scripts\src\utility\common.tsx" />
+    <TypeScriptCompile Include="Scripts\src\utility\hubHandler.ts" />
     <TypeScriptCompile Include="Scripts\src\workItem.tsx" />
   </ItemGroup>
   <ItemGroup>

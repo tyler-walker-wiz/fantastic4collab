@@ -59,6 +59,7 @@ var React = __importStar(require("react"));
 var ReactDOM = __importStar(require("react-dom"));
 var workItem_1 = require("./workItem");
 var appBase_1 = require("./utility/appBase");
+var hubHandler_1 = require("./utility/hubHandler");
 var WorkItems = /** @class */ (function (_super) {
     __extends(WorkItems, _super);
     function WorkItems() {
@@ -87,13 +88,30 @@ var WorkItems = /** @class */ (function (_super) {
     }
     WorkItems.prototype.handleLoad = function () {
         return __awaiter(this, void 0, void 0, function () {
+            var hub, name;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, setTimeout(function () { }, 1000)];
                     case 1:
                         _a.sent();
+                        hub = new hubHandler_1.HubHandler(function () { return alert("Connected"); }, this.onReceive);
+                        name = prompt("Enter name: ");
+                        this.setState({ hub: hub, name: name });
                         return [2 /*return*/];
                 }
+            });
+        });
+    };
+    WorkItems.prototype.onReceive = function (responses) {
+        if (typeof responses === "string") {
+            alert(responses);
+            return;
+        }
+        var grouped = responses.groupBy("Id");
+        var data = grouped.map(function (g) {
+            return g.map(function (d) {
+                var ret;
+                return ret;
             });
         });
     };
@@ -107,3 +125,9 @@ var WorkItems = /** @class */ (function (_super) {
     return WorkItems;
 }(appBase_1.BaseReactPageBasicHandleLoad));
 ReactDOM.render(React.createElement(WorkItems, null), document.getElementById('app'));
+Array.prototype.groupBy = function (key) {
+    return this.reduce(function (rv, x) {
+        (rv[x[key]] = rv[x[key]] || []).push(x);
+        return rv;
+    }, []);
+};
