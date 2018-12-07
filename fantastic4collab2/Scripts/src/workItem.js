@@ -28,7 +28,7 @@ var WorkItem = /** @class */ (function (_super) {
     }
     WorkItem.prototype.render = function () {
         var item = this.props.item;
-        return (React.createElement("div", { style: { margin: '10px', padding: '10px', border: '1px solid gray', backgroundColor: 'lightred' } },
+        return (React.createElement("div", { style: { margin: '10px', padding: '10px', border: '1px solid lightgray', backgroundColor: '#d0d0d0', borderRadius: '5px' } },
             React.createElement("div", { className: "commentBox" }, item && item.title),
             React.createElement("p", null, item && item.content)));
     };

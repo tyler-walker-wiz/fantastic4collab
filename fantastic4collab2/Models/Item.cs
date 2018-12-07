@@ -7,47 +7,33 @@ namespace fantastic4collab2.model
 {
     public class Item
     {
-        private Item() {
+        private Item()
+        {
         }
 
         public Item(int itemID, string title, string content)
         {
-            this.ItemID = itemID;
-            this.Title = title;
-            this.Content = content;
-            this.Locked = false;
+            ItemID = itemID;
+            Title = title;
+            Content = content;
+            Locked = false;
         }
 
         public Item(int itemID, string title)
         {
-            this.ItemID = itemID;
-            this.Title = title;
-            this.Content = null;
-            this.Locked = false;
+            ItemID = itemID;
+            Title = title;
+            Content = null;
+            Locked = false;
         }
 
-        public int ItemID
-        {
-            get => ItemID;
-            private set => ItemID = value;
-        }
+        public int ItemID { get; }
 
-        public string Title
-        {
-            get => Title;
-            set => Title = value;
-        }
+        public string Title { get; set; }
+        
 
-        public string Content
-        {
-            get => Content;
-            set => Content = value;
-        }
+        public string Content { get; set; }
 
-        public bool Locked
-        {
-            get => Locked;
-            set => Locked = value;
-        }        
+        public bool Locked { get; set; }
     }
 }

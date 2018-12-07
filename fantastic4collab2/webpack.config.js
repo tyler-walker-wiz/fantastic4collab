@@ -2,6 +2,7 @@
 const path = require("path");
 
 module.exports = {
+    mode: "development",
     context: path.resolve(__dirname, "./Scripts/src"),
     resolve: {
         // Add ".ts" and ".tsx" as resolvable extensions.

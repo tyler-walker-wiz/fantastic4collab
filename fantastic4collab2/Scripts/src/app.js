@@ -57,6 +57,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __importStar(require("react"));
 var ReactDOM = __importStar(require("react-dom"));
+var TagPicker_1 = require("office-ui-fabric-react/lib/components/pickers/TagPicker/TagPicker");
+require("jquery");
 var workItem_1 = require("./workItem");
 var appBase_1 = require("./utility/appBase");
 var hubHandler_1 = require("./utility/hubHandler");
@@ -72,7 +74,7 @@ var WorkItems = /** @class */ (function (_super) {
             {
                 id: "2",
                 title: "Item 2",
-                content: "Some revised content"
+                content: "Some revised content Some revised content Some revised content Some revised content Some revised content\n        Some revised content Some revised content Some revised content Some revised content Some revised content Some revised content Some revised content Some revised content"
             },
             {
                 id: "3",
@@ -83,7 +85,13 @@ var WorkItems = /** @class */ (function (_super) {
                 id: "4",
                 title: "Item 4",
                 content: "Plane"
-            }];
+            },
+            { id: "5", title: "Title", content: "This is a great description" }
+        ];
+        _this._onFilterChanged = function (filterText, tags) {
+            return tags ?
+                tags.filter(function (t) { return _this.state.items.some(function (i) { return i.title.indexOf(t.name) > -1; }); }) : [];
+        };
         return _this;
     }
     WorkItems.prototype.handleLoad = function () {
@@ -96,7 +104,7 @@ var WorkItems = /** @class */ (function (_super) {
                         _a.sent();
                         hub = new hubHandler_1.HubHandler(function () { return alert("Connected"); }, this.onReceive);
                         name = prompt("Enter name: ");
-                        this.setState({ hub: hub, name: name });
+                        this.setState({ hub: hub, name: name, items: this.dummyData });
                         return [2 /*return*/];
                 }
             });
@@ -110,17 +118,35 @@ var WorkItems = /** @class */ (function (_super) {
         var grouped = responses.groupBy("Id");
         var data = grouped.map(function (g) {
             return g.map(function (d) {
-                var ret;
+                var ret = d;
                 return ret;
             });
         });
+        alert(data);
+    };
+    WorkItems.prototype._getTextFromItem = function (item) {
+        return item.name;
     };
     WorkItems.prototype.onRender = function () {
-        var items = this.dummyData;
-        items.push({ id: "5", title: "Title", content: "This is a great description" });
+        var items = this.state.items;
         return (React.createElement("div", null,
             React.createElement("h2", null, "Welcome to the App"),
-            items.map(function (i) { return React.createElement(workItem_1.WorkItem, { item: i }); })));
+            "Group:",
+            React.createElement("div", { className: "ms-Grid", dir: "ltr" },
+                React.createElement("div", { className: "col-Grid-row" },
+                    React.createElement(TagPicker_1.TagPicker, { onResolveSuggestions: this._onFilterChanged, getTextFromItem: this._getTextFromItem, pickerSuggestionsProps: {
+                            suggestionsHeaderText: 'Suggested Groups',
+                            noResultsFoundText: 'No Groups Found',
+                        }, itemLimit: 2, disabled: false, inputProps: {
+                            onBlur: function (ev) { return console.log('onBlur called'); },
+                            onFocus: function (ev) { return console.log('onFocus called'); },
+                            style: { padding: "10px" },
+                            'aria-label': 'Group Picker',
+                            placeholder: "Start typing to search"
+                        } }))),
+            React.createElement("div", { className: "ms-Grid", dir: "ltr" },
+                React.createElement("div", { className: "col-Grid-row" }, items.map(function (v, i) { return React.createElement("div", { className: "ms-Grid-col ms-sm4 ms-lg4" },
+                    React.createElement(workItem_1.WorkItem, { item: v })); })))));
     };
     return WorkItems;
 }(appBase_1.BaseReactPageBasicHandleLoad));

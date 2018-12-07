@@ -3,10 +3,8 @@
 namespace CS3750 {
     export module BaseHubHandler {
         export class Hub<T> {
-            private onStart: () => void;
-            private onReceive: (responses: T[]) => void;
             private chat: IHub;
-            constructor(onStart: () => void, onReceive: (responses: T[]) => void) {
+            constructor(private onStart: (e: any) => void, private onReceive: (responses: T[]) => void, private receiveMessage: string, private otherMessages?: { [index: string]: (e?: any) => void }) {
                 //if ($.connection && ($.connection as any).appHub)
                 this.onStart = onStart;
                 this.onReceive = onReceive;
@@ -22,7 +20,11 @@ namespace CS3750 {
                     //alert(e + "\n" + $.connection);
                     let connection = $.hubConnection();
                     let proxy = connection.createHubProxy("appHub");
-                    proxy.on("broadcastMessage", this.onReceive);
+                    proxy.on(receiveMessage, this.onReceive);
+                    if (otherMessages)
+                        for (var msg in otherMessages) {
+                            proxy.on(msg, otherMessages[msg]);
+                        }
                     this.chat = proxy.connection.hub;
                     connection.start().done(this.onStart);
                 }

@@ -20,7 +20,7 @@ interface IWorkItemsState {
 class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
     async handleLoad() {
         await setTimeout(() => { }, 1000);
-        let hub = new HubHandler(() => alert("Connected"), this.onReceive);
+        let hub = new HubHandler(this.onConnected, this.onReceive, "broadcastMessage", { "getEverything": this.retrieveInit });
         let name = prompt("Enter name: ") as string;
         this.setState({ hub, name, items: this.dummyData });
     }
@@ -37,6 +37,12 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
             });
         });
         alert(data);
+    }
+    onConnected = (e: any) => {
+        alert("Connected");
+    }
+    retrieveInit = (e: any) => {
+        alert(JSON.stringify(e));
     }
     dummyData: IWorkItem[] = [{
         id: "1",
@@ -96,7 +102,7 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
             </div>
             <div className="ms-Grid" dir="ltr">
                 <div className="col-Grid-row">
-                    {items.map((v, i) => <div className="ms-Grid-col ms-sm4 ms-lg4"><WorkItem item={v} /></div>)}
+                    {items.map((v, i) => <div key={i} className="ms-Grid-col ms-sm4 ms-lg4"><WorkItem item={v} /></div>)}
                 </div>
             </div>
         </div>);

@@ -13,7 +13,6 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-require("jquery");
 require("signalr");
 var CS3750;
 (function (CS3750) {
@@ -22,31 +21,34 @@ var CS3750;
         var Hub = /** @class */ (function () {
             function Hub(onStart, onReceive) {
                 //if ($.connection && ($.connection as any).appHub)
-                try {
-                    this.chat = $.connection.appHub;
-                }
-                catch (e) {
-                    alert(e);
-                    throw e;
-                }
-                //else {
-                //    let connection = $.hubConnection();
-                //    let proxy = connection..createHubProxy("appHub");
-                //    this.chat = proxy.connection.hub.;
-                //}
                 this.onStart = onStart;
                 this.onReceive = onReceive;
-                // Reference the auto-generated proxy for the hub.  
-                // Create a function that the hub can call back to display messages.
-                this.chat.client.addNewMessageToPage = this.onReceive;
-                $.connection.hub.start().done(this.onStart);
+                try {
+                    this.chat = $.connection.appHub || $.connection.AppHub;
+                    // Reference the auto-generated proxy for the hub.  
+                    // Create a function that the hub can call back to display messages.
+                    if (this.chat && this.chat.client)
+                        this.chat.client.broadcastMessage = this.onReceive;
+                    $.connection.hub.start().done(this.onStart);
+                }
+                catch (e) {
+                    //alert(e + "\n" + $.connection);
+                    var connection = $.hubConnection();
+                    var proxy = connection.createHubProxy("appHub");
+                    proxy.on("broadcastMessage", this.onReceive);
+                    this.chat = proxy.connection.hub;
+                    connection.start().done(this.onStart);
+                }
             }
             Hub.prototype.htmlEncode = function (value) {
                 var encodedValue = $('<div />').text(value).html();
                 return encodedValue;
             };
             Hub.prototype.sendToServer = function (connection, data) {
-                this.chat.server.send(connection, data);
+                if (this.chat && this.chat.server)
+                    this.chat.server.send(connection, data);
+                else
+                    this.chat.send(data);
             };
             return Hub;
         }());
