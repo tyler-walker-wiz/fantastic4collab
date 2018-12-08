@@ -12,7 +12,7 @@ namespace fantastic4collab2.Services
     {
         private static string connectionString = ConfigurationManager.ConnectionStrings["NotesDB"].ConnectionString;
 
-        public static void Upsert(string groupId, Item item)
+        public static void Upsert(int groupId, Item item)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
             string content = item.Content;

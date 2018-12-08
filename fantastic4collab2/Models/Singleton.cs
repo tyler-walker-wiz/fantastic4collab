@@ -126,5 +126,19 @@ namespace fantastic4collab2.Models
         {
             return itemCollection;
         }
+
+        public bool UpdateItem(int groupID, int itemID, string itemName, string itemContent)
+        {
+            Item theItem = GetItem(groupID, itemID);
+
+            if (theItem != null)
+            {
+                theItem.Title = itemName;
+                theItem.Content = itemContent;
+                return true;
+            }
+
+            return false;
+        }
     }
 }
