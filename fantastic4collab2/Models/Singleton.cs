@@ -14,10 +14,12 @@ namespace fantastic4collab2.Models
         private static object mutex = new Object();
         private static IDictionary<int, Group> itemCollection;
         private static string connectionString = ConfigurationManager.ConnectionStrings["NotesDB"].ConnectionString;
+        private static IDictionary<string, int> lockedItems;
 
         private Singleton()
         {
             itemCollection = new Dictionary<int, Group>();
+            lockedItems = new Dictionary<string, int>();
 
             using (SqlConnection sqlConnection = new SqlConnection(connectionString))
             {
@@ -125,6 +127,28 @@ namespace fantastic4collab2.Models
         public IDictionary<int, Group> getEverything()
         {
             return itemCollection;
+        }
+
+        public IDictionary<string, int> getLockedItems() {
+            return lockedItems;
+        }
+
+        public void addLockedItem(string connectionId, int itemId) {
+            if (!lockedItems.ContainsKey(connectionId) || lockedItems.Values.Contains(itemId)) {
+                lock (mutex) {
+                    lockedItems.Add(connectionId, itemId);
+                }
+            }
+        }
+
+        public void removeLockedItem(string connectionId, int itemId) {
+            if (lockedItems.ContainsKey(connectionId) || lockedItems.Values.Contains(itemId))
+            {
+                lock (mutex)
+                {
+                    lockedItems.Remove(connectionId);
+                }
+            }
         }
 
         public bool UpdateItem(int groupID, int itemID, string itemName, string itemContent)
