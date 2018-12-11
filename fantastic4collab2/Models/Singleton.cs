@@ -122,9 +122,20 @@ namespace fantastic4collab2.Models
             AddItem(group.GroupID, item);
         }
 
-        public IDictionary<int, Group> getEverything()
+        public GroupItemPair[] getEverything()
         {
-            return itemCollection;
+            GroupItemPair[] returnArray = new GroupItemPair[itemCollection.Count];
+            int count = 0;
+
+            foreach (var group in itemCollection.Values)
+            {
+                foreach (var item in group.items.Values)
+                {
+                    returnArray[count] = new GroupItemPair(item, group);
+                }
+            }
+
+            return returnArray;
         }
 
         public bool UpdateItem(int groupID, int itemID, string itemName, string itemContent)
