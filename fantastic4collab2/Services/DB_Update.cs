@@ -35,16 +35,18 @@ namespace fantastic4collab2.Services
         public static void Upsert(int groupId, Item item)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
+            int itemId = item.ItemID;
             string content = item.Content;
             string title = item.Title;
 
-            string UpsertString = "SET IDENTITY_INSERT Item ONMERGE Item AS [Target] USING (SELECT itemId AS itemId, title AS title, content AS content, groupId AS GroupId) AS [Source] ON [Target].itemId = [Source].itemId WHEN MATCHED THEN UPDATE SET [Target].title = @Title, [Target].content = @Content WHEN NOT MATCHED THEN INSERT (ItemId, Title, Content, GroupId) VALUES (@ItemId, @Title, @Content, @GroupId); SET IDENTITY_INSERT Item OFF";
+            string UpsertString = "MERGE Item AS [Target] USING (SELECT @ItemId AS itemId, @Title AS title, @Content AS content, @GroupId AS GroupId) AS [Source] ON [Target].itemId = [Source].itemId WHEN MATCHED THEN UPDATE SET [Target].title = @Title, [Target].content = @Content WHEN NOT MATCHED THEN INSERT (Title, Content, GroupId) VALUES (@Title, @Content, @GroupId); SET IDENTITY_INSERT Item OFF";
             string GetIdString = "SELECT ItemId FROM Item WHERE GroupId = @GroupId AND Title = @Title;";
 
             sqlConnection.Open();
 
             SqlCommand MyCommand = new SqlCommand(UpsertString);
             SqlCommand SelectCommand = new SqlCommand(GetIdString);
+            MyCommand.Parameters.AddWithValue("@ItemId", itemId);
             MyCommand.Parameters.AddWithValue("@GroupId", groupId);
             MyCommand.Parameters.AddWithValue("@Title", title);
             MyCommand.Parameters.AddWithValue("@Content", content);
