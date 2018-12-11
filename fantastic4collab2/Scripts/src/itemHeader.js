@@ -30,14 +30,15 @@ var ListHeaderWrapper = /** @class */ (function (_super) {
     ListHeaderWrapper.prototype.render = function () {
         var _a = this.props, items = _a.items, children = _a.children;
         return (React.createElement("div", null,
-            React.createElement("div", null,
-                React.createElement("div", { className: "ms-NavExample-LeftPane", style: { width: "208px", height: "500px", border: "1px solid #EEE", overflowY: "auto" } },
+            React.createElement("div", { style: { clear: "both" } },
+                React.createElement("div", { className: "ms-NavExample-LeftPane", style: { width: "208px", height: "500px", border: "1px solid #EEE", float: "left", overflowY: "auto" } },
                     React.createElement(Nav_1.Nav, { groups: [
                             {
+                                name: "Group",
                                 links: items
                             }
                         ], expandedStateText: 'expanded', collapsedStateText: 'collapsed', selectedKey: 'key3', expandButtonAriaLabel: 'Expand or collapse' }))),
-            React.createElement("div", { style: { float: "right" } }, children)));
+            React.createElement("div", null, children)));
     };
     return ListHeaderWrapper;
 }(React.Component));

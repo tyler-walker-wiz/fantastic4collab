@@ -1,8 +1,5 @@
 ﻿using fantastic4collab2.model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using Newtonsoft.Json;
 
 namespace fantastic4collab2.Models
 {
@@ -10,19 +7,25 @@ namespace fantastic4collab2.Models
     {
         public GroupItemPair(Item item, Group group)
         {
-            this.ItemName = item.Title;
-            this.ItemContent = item.Content;
-            this.ItemID = item.ItemID;
-            this.ItemLocked = item.Locked;
+            this.Name = item.Title;
+            this.Content = item.Content;
+            this.Id = item.ItemID;
+            this.Locked = item.Locked;
             this.GroupName = group.Name;
-            this.GroupID = group.GroupID;
+            this.GroupId = group.GroupID;
         }
 
-        public string ItemName { get; private set; }
-        public string ItemContent { get; private set; }
-        public int ItemID { get; private set; }
-        public bool ItemLocked { get; private set; }
+        [JsonProperty("name")]
+        public string Name { get; private set; }
+        [JsonProperty("content")]
+        public string Content { get; private set; }
+        [JsonProperty("id")]
+        public int Id { get; private set; }
+        [JsonProperty("locked")]
+        public bool Locked { get; private set; }
+        [JsonProperty("groupName")]
         public string GroupName { get; private set; }
-        public int GroupID { get; private set; }
+        [JsonProperty("groupId")]
+        public int GroupId { get; private set; }
     }
 }

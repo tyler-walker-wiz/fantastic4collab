@@ -7,6 +7,12 @@ import { BaseReactPageBasicHandleLoad } from './utility/appBase'
 import { HubHandler } from './utility/hubHandler';
 import { ListHeaderWrapper } from './itemHeader';
 import { INavLink } from 'office-ui-fabric-react/lib/Nav';
+import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
+import { Panel, PanelType } from 'office-ui-fabric-react/lib/Panel';
+import { TextField } from 'office-ui-fabric-react/lib/TextField';
+import { initializeIcons } from '@uifabric/icons';
+initializeIcons();
+import { Icon } from 'office-ui-fabric-react/lib/Icon';
 
 interface IResponse {
     item: IWorkItem;
@@ -18,14 +24,16 @@ interface IWorkItemsState {
     id: string;
     items: IWorkItem[];
     headers: INavLink[];
+    showPanel: boolean;
 }
 
 class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
     async handleLoad() {
         await setTimeout(() => { }, 1000);
         let hub = new HubHandler(this.onConnected, this.onReceive, "broadcastMessage", { "getEverything": this.retrieveInit });
-        let name = prompt("Enter name: ") as string;
-        this.setState({ hub, name, items: this.dummyData });
+        //let name = prompt("Enter name: ") as string;
+        let name = "tempName";
+        this.setState({ hub, name, items: [] });
     }
     onReceive(responses: IResponse[]) {
         if (typeof responses === "string") {
@@ -42,50 +50,71 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
         alert(data);
     }
     onConnected = (e: any) => {
-        alert("Connected");
+        console.log("Connected!");
     }
-    retrieveInit = (e: any) => {
-        alert(JSON.stringify(e));
+    retrieveInit = (items: IWorkItem[]) => {
+        console.log(JSON.stringify(items));
+        this.setState({ items });
     }
     onItemChange = (item: IWorkItem) => {
-        this.state.hub.sendToServer(item);
+        this.state.hub.update(item.groupId, item.id, item.name, item.content);
     }
     dummyData: IWorkItem[] = [{
         id: "1",
-        title: "Item 1",
-        content: "Some content"
+        name: "Item 1",
+        content: "Some content",
+        groupId: "2"
     },
     {
         id: "2",
-        title: "Item 2",
+        name: "Item 2",
         content: `Some revised content Some revised content Some revised content Some revised content Some revised content
-        Some revised content Some revised content Some revised content Some revised content Some revised content Some revised content Some revised content Some revised content`
+        Some revised content Some revised content Some revised content Some revised content Some revised content Some revised content Some revised content Some revised content`,
+        groupId: "2"
     },
     {
         id: "3",
-        title: "Item 3",
-        content: "Car"
+        name: "Item 3",
+        content: "Car",
+        groupId: "2"
     },
     {
         id: "4",
-        title: "Item 4",
-        content: "Plane"
+        name: "Item 4",
+        content: "Plane",
+        groupId: "2"
     },
-    { id: "5", title: "Title", content: "This is a great description" }
+    { id: "5", name: "Title", content: "This is a great description", groupId: "3" }
     ];
     private _getTextFromItem(item: any): any {
         return item.name;
     }
     private _onFilterChanged = (filterText: string, tags: ITag[] | undefined): ITag[] => {
         return tags ?
-            tags.filter(t => this.state.items.some(i => i.title.indexOf(t.name) > -1)) : [];
+            tags.filter(t => this.state.items.some(i => i.name.indexOf(t.name) > -1)) : [];
+    };
+    private _onShowPanel = () => {
+        this.setState({ showPanel: true });
+    }
+    private _onClosePanel = () => {
+        this.setState({ showPanel: false });
+    }
+    private _onRenderFooterContent = (): JSX.Element => {
+        return (
+            <div>
+                <PrimaryButton onClick={this._onClosePanel} style={{ marginRight: '8px' }}>
+                    Save
+        </PrimaryButton>
+                <DefaultButton onClick={this._onClosePanel}>Cancel</DefaultButton>
+            </div>
+        );
     };
     onRender() {
         let { items, headers } = this.state;
         if (!headers)
             headers = [{ name: "Good one", onClick: () => alert("clicked"), url: "#" }];
         return (<div>
-            <h2>Welcome to the App</h2>
+            <h2 className="ms-app-header">Fantastic 4 Collab Workspace</h2>
             <div className="ms-Grid" dir="ltr">
                 <div className="col-Grid-row">
                     {/*<TagPicker
@@ -114,6 +143,18 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
                         {items.map((v, i) => <div key={i} className="ms-Grid-col ms-sm3 ms-lg3"><WorkItem onChange={this.onItemChange} locked={false} item={v} /></div>)}
                     </div>
                 </div>
+                <DefaultButton secondaryText="Opens the Create Panel" text="Add" onClick={this._onShowPanel} iconProps={{ iconName: "Add" }} styles={{ root: { float: "right", backgroundColor: "#0078d4", color: "white", position: "absolute", top: "50", right: "50" } }} />
+                <Panel
+                    isOpen={this.state.showPanel}
+                    type={PanelType.smallFixedFar}
+                    onDismiss={this._onClosePanel}
+                    headerText="Panel - Small, right-aligned, fixed, with footer"
+                    closeButtonAriaLabel="Close"
+                    onRenderFooterContent={this._onRenderFooterContent}
+                >
+                    <TextField required={true} label="Title" />
+                    <TextField required={true} label="Description" multiline rows={10} />
+                </Panel>
             </ListHeaderWrapper>
         </div >);
     }

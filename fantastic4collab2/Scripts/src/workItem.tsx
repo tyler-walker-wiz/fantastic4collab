@@ -5,8 +5,10 @@ import { TextField } from 'office-ui-fabric-react/lib/TextField';
 
 export interface IWorkItem {
     id: string;
-    title: string;
+    name: string;
     content: string;
+    groupId: string;
+    groupName?: string;
 }
 
 interface WorkItemState {
@@ -36,7 +38,7 @@ export class WorkItem extends React.Component<IWorkItemProps, WorkItemState> {
         let { item, locked } = this.props;
         return (<div>
             <div onDoubleClick={this._showModal} style={{ margin: '10px', color: 'rgb(0, 120, 212)', border: '1px solid lightgray', borderRadius: '5px' }}>
-                <div className="commentBox" style={{ margin: "10px" }}>{item && item.title}</div>
+                <div className="commentBox" style={{ margin: "10px" }}>{item && item.name}</div>
                 <div style={{ display: "inline-block", width: "100%", backgroundColor: "lightgray" }}>
                     <p style={{ margin: "10px" }}>{item && item.content}</p>
                 </div>
@@ -50,7 +52,7 @@ export class WorkItem extends React.Component<IWorkItemProps, WorkItemState> {
                 containerClassName="ms-modalExample-container"
             >
                 <div className="ms-modalExample-header">
-                    <span id="titleId">{item.title}</span>
+                    <span id="titleId">{item.name}</span>
                 </div>
                 <div id="subtitleId" className="ms-modalExample-body">
                     <div style={{ margin: "20px" }}>

@@ -57,47 +57,70 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __importStar(require("react"));
 var ReactDOM = __importStar(require("react-dom"));
-var TagPicker_1 = require("office-ui-fabric-react/lib/components/pickers/TagPicker/TagPicker");
 require("jquery");
 var workItem_1 = require("./workItem");
 var appBase_1 = require("./utility/appBase");
 var hubHandler_1 = require("./utility/hubHandler");
 var itemHeader_1 = require("./itemHeader");
+var Button_1 = require("office-ui-fabric-react/lib/Button");
+var Panel_1 = require("office-ui-fabric-react/lib/Panel");
+var TextField_1 = require("office-ui-fabric-react/lib/TextField");
+var icons_1 = require("@uifabric/icons");
+icons_1.initializeIcons();
 var WorkItems = /** @class */ (function (_super) {
     __extends(WorkItems, _super);
     function WorkItems() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.onConnected = function (e) {
-            alert("Connected");
+            console.log("Connected!");
         };
-        _this.retrieveInit = function (e) {
-            alert(JSON.stringify(e));
+        _this.retrieveInit = function (items) {
+            console.log(JSON.stringify(items));
+            _this.setState({ items: items });
+        };
+        _this.onItemChange = function (item) {
+            _this.state.hub.update(item.groupId, item.id, item.name, item.content);
         };
         _this.dummyData = [{
                 id: "1",
-                title: "Item 1",
-                content: "Some content"
+                name: "Item 1",
+                content: "Some content",
+                groupId: "2"
             },
             {
                 id: "2",
-                title: "Item 2",
-                content: "Some revised content Some revised content Some revised content Some revised content Some revised content\n        Some revised content Some revised content Some revised content Some revised content Some revised content Some revised content Some revised content Some revised content"
+                name: "Item 2",
+                content: "Some revised content Some revised content Some revised content Some revised content Some revised content\n        Some revised content Some revised content Some revised content Some revised content Some revised content Some revised content Some revised content Some revised content",
+                groupId: "2"
             },
             {
                 id: "3",
-                title: "Item 3",
-                content: "Car"
+                name: "Item 3",
+                content: "Car",
+                groupId: "2"
             },
             {
                 id: "4",
-                title: "Item 4",
-                content: "Plane"
+                name: "Item 4",
+                content: "Plane",
+                groupId: "2"
             },
-            { id: "5", title: "Title", content: "This is a great description" }
+            { id: "5", name: "Title", content: "This is a great description", groupId: "3" }
         ];
         _this._onFilterChanged = function (filterText, tags) {
             return tags ?
-                tags.filter(function (t) { return _this.state.items.some(function (i) { return i.title.indexOf(t.name) > -1; }); }) : [];
+                tags.filter(function (t) { return _this.state.items.some(function (i) { return i.name.indexOf(t.name) > -1; }); }) : [];
+        };
+        _this._onShowPanel = function () {
+            _this.setState({ showPanel: true });
+        };
+        _this._onClosePanel = function () {
+            _this.setState({ showPanel: false });
+        };
+        _this._onRenderFooterContent = function () {
+            return (React.createElement("div", null,
+                React.createElement(Button_1.PrimaryButton, { onClick: _this._onClosePanel, style: { marginRight: '8px' } }, "Save"),
+                React.createElement(Button_1.DefaultButton, { onClick: _this._onClosePanel }, "Cancel")));
         };
         return _this;
     }
@@ -110,8 +133,8 @@ var WorkItems = /** @class */ (function (_super) {
                     case 1:
                         _a.sent();
                         hub = new hubHandler_1.HubHandler(this.onConnected, this.onReceive, "broadcastMessage", { "getEverything": this.retrieveInit });
-                        name = prompt("Enter name: ");
-                        this.setState({ hub: hub, name: name, items: this.dummyData });
+                        name = "tempName";
+                        this.setState({ hub: hub, name: name, items: [] });
                         return [2 /*return*/];
                 }
             });
@@ -135,28 +158,22 @@ var WorkItems = /** @class */ (function (_super) {
         return item.name;
     };
     WorkItems.prototype.onRender = function () {
+        var _this = this;
         var _a = this.state, items = _a.items, headers = _a.headers;
         if (!headers)
             headers = [{ name: "Good one", onClick: function () { return alert("clicked"); }, url: "#" }];
         return (React.createElement("div", null,
-            React.createElement("h2", null, "Welcome to the App"),
-            "Group:",
+            React.createElement("h2", { className: "ms-app-header" }, "Fantastic 4 Collab Workspace"),
             React.createElement("div", { className: "ms-Grid", dir: "ltr" },
-                React.createElement("div", { className: "col-Grid-row" },
-                    React.createElement(TagPicker_1.TagPicker, { onResolveSuggestions: this._onFilterChanged, getTextFromItem: this._getTextFromItem, pickerSuggestionsProps: {
-                            suggestionsHeaderText: 'Suggested Groups',
-                            noResultsFoundText: 'No Groups Found',
-                        }, itemLimit: 2, disabled: false, inputProps: {
-                            onBlur: function (ev) { return console.log('onBlur called'); },
-                            onFocus: function (ev) { return console.log('onFocus called'); },
-                            style: { padding: "10px" },
-                            'aria-label': 'Group Picker',
-                            placeholder: "Start typing to search"
-                        } }))),
+                React.createElement("div", { className: "col-Grid-row" })),
             React.createElement(itemHeader_1.ListHeaderWrapper, { items: headers },
                 React.createElement("div", { className: "ms-Grid", dir: "ltr" },
-                    React.createElement("div", { className: "col-Grid-row" }, items.map(function (v, i) { return React.createElement("div", { key: i, className: "ms-Grid-col ms-sm4 ms-lg4" },
-                        React.createElement(workItem_1.WorkItem, { locked: true, item: v })); }))))));
+                    React.createElement("div", { className: "col-Grid-row" }, items.map(function (v, i) { return React.createElement("div", { key: i, className: "ms-Grid-col ms-sm3 ms-lg3" },
+                        React.createElement(workItem_1.WorkItem, { onChange: _this.onItemChange, locked: false, item: v })); }))),
+                React.createElement(Button_1.DefaultButton, { secondaryText: "Opens the Create Panel", text: "Add", onClick: this._onShowPanel, iconProps: { iconName: "Add" }, styles: { root: { float: "right", backgroundColor: "#0078d4", color: "white", position: "absolute", top: "50", right: "50" } } }),
+                React.createElement(Panel_1.Panel, { isOpen: this.state.showPanel, type: Panel_1.PanelType.smallFixedFar, onDismiss: this._onClosePanel, headerText: "Panel - Small, right-aligned, fixed, with footer", closeButtonAriaLabel: "Close", onRenderFooterContent: this._onRenderFooterContent },
+                    React.createElement(TextField_1.TextField, { required: true, label: "Title" }),
+                    React.createElement(TextField_1.TextField, { required: true, label: "Description", multiline: true, rows: 10 })))));
     };
     return WorkItems;
 }(appBase_1.BaseReactPageBasicHandleLoad));
