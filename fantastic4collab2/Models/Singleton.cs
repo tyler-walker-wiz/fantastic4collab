@@ -37,7 +37,7 @@ namespace fantastic4collab2.Models
                         string itemTitle = reader.GetString(3);
                         string itemContent = reader.GetString(4);
 
-                        AddItem(new Group(groupID, groupName), new Item(itemID, itemTitle, itemContent));
+                        AddItem(new Group(groupName), new Item(itemTitle, itemContent));
                     }
                 }
                 catch (Exception e)
@@ -105,7 +105,7 @@ namespace fantastic4collab2.Models
         {
             if (!itemCollection.ContainsKey(groupID))
             {
-                Group group = new Group(groupID);
+                Group group = new Group();
                 AddGroup(group);
             }
 

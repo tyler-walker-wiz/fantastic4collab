@@ -19,7 +19,11 @@ var CS3750;
     var BaseHubHandler;
     (function (BaseHubHandler) {
         var Hub = /** @class */ (function () {
-            function Hub(onStart, onReceive) {
+            function Hub(onStart, onReceive, receiveMessage, otherMessages) {
+                this.onStart = onStart;
+                this.onReceive = onReceive;
+                this.receiveMessage = receiveMessage;
+                this.otherMessages = otherMessages;
                 //if ($.connection && ($.connection as any).appHub)
                 this.onStart = onStart;
                 this.onReceive = onReceive;
@@ -35,7 +39,11 @@ var CS3750;
                     //alert(e + "\n" + $.connection);
                     var connection = $.hubConnection();
                     var proxy = connection.createHubProxy("appHub");
-                    proxy.on("broadcastMessage", this.onReceive);
+                    proxy.on(receiveMessage, this.onReceive);
+                    if (otherMessages)
+                        for (var msg in otherMessages) {
+                            proxy.on(msg, otherMessages[msg]);
+                        }
                     this.chat = proxy.connection.hub;
                     connection.start().done(this.onStart);
                 }

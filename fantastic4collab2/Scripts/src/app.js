@@ -66,6 +66,12 @@ var WorkItems = /** @class */ (function (_super) {
     __extends(WorkItems, _super);
     function WorkItems() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.onConnected = function (e) {
+            alert("Connected");
+        };
+        _this.retrieveInit = function (e) {
+            alert(JSON.stringify(e));
+        };
         _this.dummyData = [{
                 id: "1",
                 title: "Item 1",
@@ -102,7 +108,7 @@ var WorkItems = /** @class */ (function (_super) {
                     case 0: return [4 /*yield*/, setTimeout(function () { }, 1000)];
                     case 1:
                         _a.sent();
-                        hub = new hubHandler_1.HubHandler(function () { return alert("Connected"); }, this.onReceive);
+                        hub = new hubHandler_1.HubHandler(this.onConnected, this.onReceive, "broadcastMessage", { "getEverything": this.retrieveInit });
                         name = prompt("Enter name: ");
                         this.setState({ hub: hub, name: name, items: this.dummyData });
                         return [2 /*return*/];
@@ -145,7 +151,7 @@ var WorkItems = /** @class */ (function (_super) {
                             placeholder: "Start typing to search"
                         } }))),
             React.createElement("div", { className: "ms-Grid", dir: "ltr" },
-                React.createElement("div", { className: "col-Grid-row" }, items.map(function (v, i) { return React.createElement("div", { className: "ms-Grid-col ms-sm4 ms-lg4" },
+                React.createElement("div", { className: "col-Grid-row" }, items.map(function (v, i) { return React.createElement("div", { key: i, className: "ms-Grid-col ms-sm4 ms-lg4" },
                     React.createElement(workItem_1.WorkItem, { item: v })); })))));
     };
     return WorkItems;
