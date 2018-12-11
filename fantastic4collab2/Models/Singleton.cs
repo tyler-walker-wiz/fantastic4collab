@@ -14,10 +14,12 @@ namespace fantastic4collab2.Models
         private static object mutex = new Object();
         private static IDictionary<int, Group> itemCollection;
         private static string connectionString = ConfigurationManager.ConnectionStrings["NotesDB"].ConnectionString;
+        private static IDictionary<string, int> lockedItems;
 
         private Singleton()
         {
             itemCollection = new Dictionary<int, Group>();
+            lockedItems = new Dictionary<string, int>();
 
             using (SqlConnection sqlConnection = new SqlConnection(connectionString))
             {
@@ -37,7 +39,7 @@ namespace fantastic4collab2.Models
                         string itemTitle = reader.GetString(3);
                         string itemContent = reader.GetString(4);
 
-                        AddItem(new Group(groupID, groupName), new Item(itemID, itemTitle, itemContent));
+                        AddItem(new Group(groupName), new Item(itemTitle, itemContent));
                     }
                 }
                 catch (Exception e)
@@ -105,7 +107,7 @@ namespace fantastic4collab2.Models
         {
             if (!itemCollection.ContainsKey(groupID))
             {
-                Group group = new Group(groupID);
+                Group group = new Group();
                 AddGroup(group);
             }
 
@@ -122,9 +124,42 @@ namespace fantastic4collab2.Models
             AddItem(group.GroupID, item);
         }
 
-        public IDictionary<int, Group> getEverything()
+        public GroupItemPair[] getEverything()
         {
-            return itemCollection;
+            GroupItemPair[] returnArray = new GroupItemPair[itemCollection.Count];
+            int count = 0;
+
+            foreach (var group in itemCollection.Values)
+            {
+                foreach (var item in group.items.Values)
+                {
+                    returnArray[count] = new GroupItemPair(item, group);
+                }
+            }
+
+            return returnArray;
+        }
+
+        public IDictionary<string, int> getLockedItems() {
+            return lockedItems;
+        }
+
+        public void addLockedItem(string connectionId, int itemId) {
+            if (!lockedItems.ContainsKey(connectionId) || lockedItems.Values.Contains(itemId)) {
+                lock (mutex) {
+                    lockedItems.Add(connectionId, itemId);
+                }
+            }
+        }
+
+        public void removeLockedItem(string connectionId, int itemId) {
+            if (lockedItems.ContainsKey(connectionId) || lockedItems.Values.Contains(itemId))
+            {
+                lock (mutex)
+                {
+                    lockedItems.Remove(connectionId);
+                }
+            }
         }
 
         public bool UpdateItem(int groupID, int itemID, string itemName, string itemContent)

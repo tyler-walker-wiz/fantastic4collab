@@ -16,13 +16,6 @@ namespace fantastic4collab2.Hubs
     {
         private static List<string> currentConnections = new List<string>();
 
-        public void Send(string name, string message)
-        {
-            Console.WriteLine("Connection ID: " + Context.ConnectionId);
-            // Call the broadcastMessage method to update clients.
-            Clients.All.broadcastMessage(name, message);
-        }
-
         public bool CreateGroup(string groupName)
         {
             // Create a new Group in the DB and singleton
@@ -32,8 +25,9 @@ namespace fantastic4collab2.Hubs
             try
             {
                 // Insert group into DB and get the returned groupID so a Group object can be created
-                //Group newGroup = new Group(groupID, groupName);
-                //thisInstance.AddGroup(newGroup);
+                Group newGroup = new Group(groupName);
+                DB_Update.createGroup(newGroup);
+                thisInstance.AddGroup(newGroup);
                 Broadcast();
                 return true;
             }
@@ -46,14 +40,15 @@ namespace fantastic4collab2.Hubs
         public bool CreateItem(int groupID, string itemName, string itemContents)
         {
             // Create a new work item in the DB and singleton
-            // Once new item is created broadcast
+            // Once new item is created and broadcasted
             Singleton thisInstance = Singleton.Instance;
 
             try
             {
                 // Insert item details into DB and get the returned itemID so an Item object can be created
-                // Item newItem = new Item(itemID, itemName, itemContents);
-                // thisInstance.AddItem(groupID, newItem);
+                Item newItem = new Item(itemName, itemContents);
+                DB_Update.Upsert(groupID, newItem);
+                thisInstance.AddItem(groupID, newItem);
                 Broadcast();
                 return true;
             }
@@ -66,16 +61,34 @@ namespace fantastic4collab2.Hubs
 
         public bool LockItem(int itemID)
         {
+            Singleton thisInstance = Singleton.Instance;
             // Attempt to lock an item before beginning to edit, if lock fails reject edits
             // Once item is locked broadcast
-            return false;
+            if (!thisInstance.getLockedItems().ContainsKey(Context.ConnectionId) || !thisInstance.getLockedItems().Values.Contains(itemID))
+            {
+                thisInstance.addLockedItem(Context.ConnectionId, itemID);
+                Broadcast();
+                return true;
+            } else {
+                return false;
+            }
         }
 
         public bool UnlockItem(int itemID)
         {
+            Singleton thisInstance = Singleton.Instance;
             // Release lock on item so that other users can now edit the item
             // Once item is unlocked broadcast
-            return false;
+            if (thisInstance.getLockedItems().ContainsKey(Context.ConnectionId) || thisInstance.getLockedItems().Values.Contains(itemID))
+            {
+                thisInstance.removeLockedItem(Context.ConnectionId, itemID);
+                Broadcast();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public bool UpdateItem(int groupID, int itemID, string itemName, string itemContent)
@@ -88,7 +101,7 @@ namespace fantastic4collab2.Hubs
             {
                 // Item was successfully updated in the singleton, changes should be reflected in the DB
                 DB_Update.Upsert(groupID, thisInstance.GetItem(groupID, itemID));
-                Broadcast(); // Definition required
+                Broadcast();
                 return true;
             }
             else
@@ -98,14 +111,17 @@ namespace fantastic4collab2.Hubs
             }
         }
 
+        public void update() {
+            Broadcast();
+        }
+
         public override Task OnConnected()
         {
             currentConnections.Add(Context.ConnectionId);
 
             Singleton singletonInstance = Singleton.Instance;
 
-            Clients.All.getEverything(singletonInstance.getEverything());
-
+            Broadcast();
             return base.OnConnected();
         }
 
@@ -121,12 +137,14 @@ namespace fantastic4collab2.Hubs
             {
                 currentConnections.Add(Context.ConnectionId);
             }
+            Broadcast();
             return base.OnReconnected();
         }
 
         private void Broadcast()
         {
-            // Send changes to clients
+            Singleton thisInstance = Singleton.Instance;
+            Clients.All.getEverything(thisInstance.getEverything());
         }
     }
 }

@@ -11,23 +11,21 @@ namespace fantastic4collab2.model
         {
         }
 
-        public Item(int itemID, string title, string content)
+        public Item(string title, string content)
         {
-            ItemID = itemID;
             Title = title;
             Content = content;
             Locked = false;
         }
 
-        public Item(int itemID, string title)
+        public Item(string title)
         {
-            ItemID = itemID;
             Title = title;
             Content = null;
             Locked = false;
         }
 
-        public int ItemID { get; }
+        public int ItemID { get; set; }
 
         public string Title { get; set; }
         
