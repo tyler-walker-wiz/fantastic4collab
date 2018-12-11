@@ -7,7 +7,7 @@ namespace fantastic4collab2.model
 {
     public class Group
     {
-        IDictionary<int, Item> items = new Dictionary<int, Item>();
+        public IDictionary<int, Item> items = new Dictionary<int, Item>();
 
         public Group()
         {
