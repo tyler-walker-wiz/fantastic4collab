@@ -4,7 +4,9 @@ import { TagPicker, ITag } from 'office-ui-fabric-react/lib/components/pickers/T
 import 'jquery';
 import { IWorkItem, WorkItem } from './workItem';
 import { BaseReactPageBasicHandleLoad } from './utility/appBase'
-import { HubHandler } from './utility/hubHandler'
+import { HubHandler } from './utility/hubHandler';
+import { ListHeaderWrapper } from './itemHeader';
+import { INavLink } from 'office-ui-fabric-react/lib/Nav';
 
 interface IResponse {
     item: IWorkItem;
@@ -15,6 +17,7 @@ interface IWorkItemsState {
     name: string;
     id: string;
     items: IWorkItem[];
+    headers: INavLink[];
 }
 
 class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
@@ -43,6 +46,9 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
     }
     retrieveInit = (e: any) => {
         alert(JSON.stringify(e));
+    }
+    onItemChange = (item: IWorkItem) => {
+        this.state.hub.sendToServer(item);
     }
     dummyData: IWorkItem[] = [{
         id: "1",
@@ -75,13 +81,14 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
             tags.filter(t => this.state.items.some(i => i.title.indexOf(t.name) > -1)) : [];
     };
     onRender() {
-        let { items } = this.state;
+        let { items, headers } = this.state;
+        if (!headers)
+            headers = [{ name: "Good one", onClick: () => alert("clicked"), url: "#" }];
         return (<div>
             <h2>Welcome to the App</h2>
-            Group:
             <div className="ms-Grid" dir="ltr">
                 <div className="col-Grid-row">
-                    <TagPicker
+                    {/*<TagPicker
                         onResolveSuggestions={this._onFilterChanged}
                         getTextFromItem={this._getTextFromItem}
                         pickerSuggestionsProps={{
@@ -98,14 +105,17 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
                             placeholder: "Start typing to search"
                         }}
                     />
+                    */}
                 </div>
             </div>
-            <div className="ms-Grid" dir="ltr">
-                <div className="col-Grid-row">
-                    {items.map((v, i) => <div key={i} className="ms-Grid-col ms-sm4 ms-lg4"><WorkItem item={v} /></div>)}
+            <ListHeaderWrapper items={headers}>
+                <div className="ms-Grid" dir="ltr">
+                    <div className="col-Grid-row">
+                        {items.map((v, i) => <div key={i} className="ms-Grid-col ms-sm3 ms-lg3"><WorkItem onChange={this.onItemChange} locked={false} item={v} /></div>)}
+                    </div>
                 </div>
-            </div>
-        </div>);
+            </ListHeaderWrapper>
+        </div >);
     }
 }
 

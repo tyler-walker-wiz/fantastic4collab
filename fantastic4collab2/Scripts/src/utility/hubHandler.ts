@@ -6,7 +6,6 @@ namespace CS3750 {
             private chat: IHub;
             constructor(private onStart: (e: any) => void, private onReceive: (responses: T[]) => void, private receiveMessage: string, private otherMessages?: { [index: string]: (e?: any) => void }) {
                 //if ($.connection && ($.connection as any).appHub)
-                this.onStart = onStart;
                 this.onReceive = onReceive;
                 try {
                     this.chat = ($.connection as any).appHub || ($.connection as any).AppHub as IHub;
@@ -14,7 +13,7 @@ namespace CS3750 {
                     // Create a function that the hub can call back to display messages.
                     if (this.chat && this.chat.client)
                         this.chat.client.broadcastMessage = this.onReceive;
-                    $.connection.hub.start().done(this.onStart);
+                    $.connection.hub.start().done(this.forStart);
                 }
                 catch (e) {
                     //alert(e + "\n" + $.connection);
@@ -30,12 +29,19 @@ namespace CS3750 {
                 }
 
             }
+            init() {
+
+            }
+            forStart = (chat: IHub) => {
+                this.chat = chat;
+                this.onStart && this.onStart(chat);
+            }
             htmlEncode(value: string) {
                 var encodedValue = $('<div />').text(value).html();
                 return encodedValue;
             }
-            sendToServer(connection: SignalR.Connection, data: any) {
-                if (this.chat && this.chat.server)
+            sendToServer(data: any, connection?: SignalR.Connection) {
+                if (this.chat && this.chat.server && connection)
                     this.chat.server.send(connection, data);
                 else
                     this.chat.send(data);

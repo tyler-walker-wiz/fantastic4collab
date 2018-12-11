@@ -21,16 +21,41 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __importStar(require("react"));
+var Modal_1 = require("office-ui-fabric-react/lib/Modal");
+var Button_1 = require("office-ui-fabric-react/lib/Button");
 var WorkItem = /** @class */ (function (_super) {
     __extends(WorkItem, _super);
     function WorkItem() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this._showModal = function () {
+            var isShowing = _this.state.showModal;
+            if (!isShowing)
+                _this.setState({ showModal: true });
+        };
+        _this._closeModal = function () {
+            var isShowing = _this.state.showModal;
+            if (isShowing)
+                _this.setState({ showModal: false });
+        };
+        return _this;
     }
     WorkItem.prototype.render = function () {
-        var item = this.props.item;
-        return (React.createElement("div", { style: { margin: '10px', padding: '10px', border: '1px solid lightgray', backgroundColor: '#d0d0d0', borderRadius: '5px' } },
-            React.createElement("div", { className: "commentBox" }, item && item.title),
-            React.createElement("p", null, item && item.content)));
+        var _a = this.props, item = _a.item, locked = _a.locked;
+        return (React.createElement("div", null,
+            React.createElement("div", { onDoubleClick: this._showModal, style: { margin: '10px', padding: '10px', border: '1px solid rgb(0, 120, 212)', borderRadius: '5px' } },
+                React.createElement("div", { className: "commentBox" }, item && item.title),
+                React.createElement("p", null, item && item.content)),
+            React.createElement(Modal_1.Modal, { titleAriaId: "titleId", subtitleAriaId: "subtitleId", isOpen: this.state.showModal, onDismiss: this._closeModal, isBlocking: false, containerClassName: "ms-modalExample-container" },
+                React.createElement("div", { className: "ms-modalExample-header" },
+                    React.createElement("span", { id: "titleId" }, item.title)),
+                React.createElement("div", { id: "subtitleId", className: "ms-modalExample-body" },
+                    React.createElement(Button_1.DefaultButton, { onClick: this._closeModal, text: "Close" }),
+                    locked && React.createElement("p", null, item.content),
+                    !locked &&
+                        React.createElement("textarea", null, item.content)))));
+    };
+    WorkItem.prototype.componentWillMount = function () {
+        this.setState({ showModal: false });
     };
     return WorkItem;
 }(React.Component));
