@@ -61,23 +61,23 @@ namespace CS3750 {
                 }
                 return false;
             }
-            async unlockItem(id: string) {
+            async unlockItem(itemID: string) {
                 if (this.chat) {
-                    let canUpdate = await this.chat.invoke("LockItem", id);
+                    let canUpdate = await this.chat.invoke("UnlockItem", itemID);
                     return canUpdate;
                 }
                 return false;
             }
-            async createItem(id: string) {
+            async createItem(groupId: string, itemName: string, itemContents: string) {
                 if (this.chat) {
-                    let canUpdate = await this.chat.invoke("LockItem", id);
+                    let canUpdate = await this.chat.invoke("CreateItem", groupId, itemName, itemContents);
                     return canUpdate;
                 }
                 return false;
             }
-            async createGroup(id: string) {
+            async createGroup(groupName: string) {
                 if (this.chat) {
-                    let canUpdate = await this.chat.invoke("LockItem", id);
+                    let canUpdate = await this.chat.invoke("CreateGroup", groupName);
                     return canUpdate;
                 }
                 return false;
