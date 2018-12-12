@@ -52,9 +52,9 @@ namespace fantastic4collab2.Hubs
                 Broadcast();
                 return true;
             }
-            catch
+            catch (Exception e)
             {
-                return false;
+                throw e;
             }
 
         }
