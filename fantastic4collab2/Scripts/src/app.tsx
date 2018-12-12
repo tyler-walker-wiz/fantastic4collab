@@ -6,7 +6,7 @@ import { IWorkItem, WorkItem } from './workItem';
 import { BaseReactPageBasicHandleLoad } from './utility/appBase'
 import { HubHandler } from './utility/hubHandler';
 import { ListHeaderWrapper } from './itemHeader';
-import { INavLink } from 'office-ui-fabric-react/lib/Nav';
+import { INavLink, INav } from 'office-ui-fabric-react/lib/Nav';
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Panel, PanelType } from 'office-ui-fabric-react/lib/Panel';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
@@ -18,6 +18,7 @@ interface IResponse {
     item: IWorkItem;
 }
 
+
 interface IWorkItemsState {
     hub: HubHandler<IResponse>;
     name: string;
@@ -25,6 +26,8 @@ interface IWorkItemsState {
     items: IWorkItem[];
     headers: INavLink[];
     showPanel: boolean;
+    header: INavLink;
+    newItem?: IWorkItem;
 }
 
 class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
@@ -54,7 +57,10 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
     }
     retrieveInit = (items: IWorkItem[]) => {
         console.log(JSON.stringify(items));
-        this.setState({ items });
+        let headers = items.groupBy("groupId")
+            .map(i => { let group = i[0]; return { id: group.id, key: group.groupId, onClick: (e, i) => this._selectHeader(i), name: group.groupName, url: "#" } as INavLink })
+            .filter(i => !!i);
+        this.setState({ items, headers });
     }
     onItemChange = (item: IWorkItem) => {
         this.state.hub.update(item.groupId, item.id, item.name, item.content);
@@ -103,17 +109,30 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
         return (
             <div>
                 <PrimaryButton onClick={() => {
-                    this._onClosePanel; this.state.hub.createItem("1", "Test name", "Test description"); }} style={{ marginRight: '8px' }}>
+                    let { header, newItem } = this.state;
+                    this._onClosePanel();
+                    if (header && newItem)
+                        this.state.hub.createItem(header.id, newItem.id, newItem.content);
+                }} style={{ marginRight: '8px' }}>
                     Save
         </PrimaryButton>
                 <DefaultButton onClick={this._onClosePanel}>Cancel</DefaultButton>
             </div>
         );
     };
+
+    private _selectHeader = (header: INavLink | undefined) => {
+        if (header)
+            this.setState({ header });
+    }
     onRender() {
-        let { items, headers } = this.state;
+        let { items, headers, header } = this.state;
         if (!headers)
-            headers = [{ name: "Good one", onClick: () => alert("clicked"), url: "#" }];
+            headers = [{ name: "Good one", onClick: (e, i) => this._selectHeader(i), url: "#", id: "2", key: "2" }];
+        if (!header)
+            header = headers[0];
+        if (header)
+            items = $.grep(items, i => i.groupId == header.key);
         return (<div>
             <h2 className="ms-app-header">Fantastic 4 Collab Workspace</h2>
             <div className="ms-Grid" dir="ltr">
@@ -138,7 +157,7 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
                     */}
                 </div>
             </div>
-            <ListHeaderWrapper items={headers}>
+            <ListHeaderWrapper selected={header} items={headers}>
                 <div className="ms-Grid" dir="ltr">
                     <div className="col-Grid-row">
                         {items.map((v, i) => <div key={i} className="ms-Grid-col ms-sm3 ms-lg3"><WorkItem onChange={this.onItemChange} locked={false} item={v} /></div>)}
@@ -153,8 +172,8 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
                     closeButtonAriaLabel="Close"
                     onRenderFooterContent={this._onRenderFooterContent}
                 >
-                    <TextField required={true} label="Title" id="newItemNameField"/>
-                    <TextField required={true} label="Description" multiline rows={10} id="newItemDescField"/>
+                    <TextField required={true} label="Title" id="newItemNameField" />
+                    <TextField required={true} label="Description" multiline rows={10} id="newItemDescField" />
                 </Panel>
             </ListHeaderWrapper>
         </div >);

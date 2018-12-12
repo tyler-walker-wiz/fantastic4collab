@@ -27,7 +27,7 @@ namespace fantastic4collab2.Services
             MyCommand.Parameters.AddWithValue("@name", name);
             MyCommand.ExecuteScalar();
 
-            group.GroupID = (int) SelectCommand.ExecuteScalar();
+            group.GroupID = (int)SelectCommand.ExecuteScalar();
 
             myConnection.Close();
         }
@@ -39,20 +39,22 @@ namespace fantastic4collab2.Services
             string content = item.Content;
             string title = item.Title;
 
-            string UpsertString = "MERGE Item AS [Target] USING (SELECT @ItemId AS itemId, @Title AS title, @Content AS content, @GroupId AS GroupId) AS [Source] ON [Target].itemId = [Source].itemId WHEN MATCHED THEN UPDATE SET [Target].title = @Title, [Target].content = @Content WHEN NOT MATCHED THEN INSERT (Title, Content, GroupId) VALUES (@Title, @Content, @GroupId); SET IDENTITY_INSERT Item OFF";
+            string UpsertString = "MERGE Item AS [Target] USING (SELECT @ItemId AS itemId, @Title AS title, @Content AS content, @GroupId AS GroupId) AS [Source] ON [Target].itemId = [Source].itemId WHEN MATCHED THEN UPDATE SET [Target].title = @Title, [Target].content = @Content WHEN NOT MATCHED THEN INSERT (Title, Content, GroupId) VALUES (@Title, @Content, 45); SET IDENTITY_INSERT Item OFF";
             string GetIdString = "SELECT ItemId FROM Item WHERE GroupId = @GroupId AND Title = @Title;";
 
             sqlConnection.Open();
 
-            SqlCommand MyCommand = new SqlCommand(UpsertString);
-            SqlCommand SelectCommand = new SqlCommand(GetIdString);
+            SqlCommand MyCommand = new SqlCommand(UpsertString) { Connection = sqlConnection };
+            SqlCommand SelectCommand = new SqlCommand(GetIdString) { Connection = sqlConnection };
+            SelectCommand.Parameters.AddWithValue("@GroupId", groupId);
+            SelectCommand.Parameters.AddWithValue("@Title", title);
             MyCommand.Parameters.AddWithValue("@ItemId", itemId);
             MyCommand.Parameters.AddWithValue("@GroupId", groupId);
             MyCommand.Parameters.AddWithValue("@Title", title);
             MyCommand.Parameters.AddWithValue("@Content", content);
             MyCommand.ExecuteScalar();
 
-            item.ItemID = (int) SelectCommand.ExecuteScalar();
+            item.ItemID = (int)SelectCommand.ExecuteScalar();
 
             sqlConnection.Close();
         }

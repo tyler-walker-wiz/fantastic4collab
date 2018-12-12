@@ -153,7 +153,7 @@ var CS3750;
                         switch (_a.label) {
                             case 0:
                                 if (!this.chat) return [3 /*break*/, 2];
-                                return [4 /*yield*/, this.chat.invoke("CreateItem", +groupId, itemName, itemContents)];
+                                return [4 /*yield*/, this.chat.invoke("CreateItem", groupId, itemName, itemContents)];
                             case 1:
                                 canUpdate = _a.sent();
                                 return [2 /*return*/, canUpdate];
