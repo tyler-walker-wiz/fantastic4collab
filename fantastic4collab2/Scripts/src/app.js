@@ -119,7 +119,10 @@ var WorkItems = /** @class */ (function (_super) {
         };
         _this._onRenderFooterContent = function () {
             return (React.createElement("div", null,
-                React.createElement(Button_1.PrimaryButton, { onClick: _this._onClosePanel, style: { marginRight: '8px' } }, "Save"),
+                React.createElement(Button_1.PrimaryButton, { onClick: function () {
+                        _this._onClosePanel;
+                        _this.state.hub.createItem("1", "Test name", "Test description");
+                    }, style: { marginRight: '8px' } }, "Save"),
                 React.createElement(Button_1.DefaultButton, { onClick: _this._onClosePanel }, "Cancel")));
         };
         return _this;
@@ -171,9 +174,9 @@ var WorkItems = /** @class */ (function (_super) {
                     React.createElement("div", { className: "col-Grid-row" }, items.map(function (v, i) { return React.createElement("div", { key: i, className: "ms-Grid-col ms-sm3 ms-lg3" },
                         React.createElement(workItem_1.WorkItem, { onChange: _this.onItemChange, locked: false, item: v })); }))),
                 React.createElement(Button_1.DefaultButton, { secondaryText: "Opens the Create Panel", text: "Add", onClick: this._onShowPanel, iconProps: { iconName: "Add" }, styles: { root: { float: "right", backgroundColor: "#0078d4", color: "white", position: "absolute", top: "50", right: "50" } } }),
-                React.createElement(Panel_1.Panel, { isOpen: this.state.showPanel, type: Panel_1.PanelType.smallFixedFar, onDismiss: this._onClosePanel, headerText: "Panel - Small, right-aligned, fixed, with footer", closeButtonAriaLabel: "Close", onRenderFooterContent: this._onRenderFooterContent },
-                    React.createElement(TextField_1.TextField, { required: true, label: "Title" }),
-                    React.createElement(TextField_1.TextField, { required: true, label: "Description", multiline: true, rows: 10 })))));
+                React.createElement(Panel_1.Panel, { isOpen: this.state.showPanel, type: Panel_1.PanelType.smallFixedFar, onDismiss: this._onClosePanel, headerText: "What would you like to say?", closeButtonAriaLabel: "Close", onRenderFooterContent: this._onRenderFooterContent },
+                    React.createElement(TextField_1.TextField, { required: true, label: "Title", id: "newItemNameField" }),
+                    React.createElement(TextField_1.TextField, { required: true, label: "Description", multiline: true, rows: 10, id: "newItemDescField" })))));
     };
     return WorkItems;
 }(appBase_1.BaseReactPageBasicHandleLoad));

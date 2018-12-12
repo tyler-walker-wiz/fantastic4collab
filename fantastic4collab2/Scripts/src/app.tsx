@@ -102,7 +102,8 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
     private _onRenderFooterContent = (): JSX.Element => {
         return (
             <div>
-                <PrimaryButton onClick={this._onClosePanel} style={{ marginRight: '8px' }}>
+                <PrimaryButton onClick={() => {
+                    this._onClosePanel; this.state.hub.createItem("1", "Test name", "Test description"); }} style={{ marginRight: '8px' }}>
                     Save
         </PrimaryButton>
                 <DefaultButton onClick={this._onClosePanel}>Cancel</DefaultButton>
@@ -148,12 +149,12 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
                     isOpen={this.state.showPanel}
                     type={PanelType.smallFixedFar}
                     onDismiss={this._onClosePanel}
-                    headerText="Panel - Small, right-aligned, fixed, with footer"
+                    headerText="What would you like to say?"
                     closeButtonAriaLabel="Close"
                     onRenderFooterContent={this._onRenderFooterContent}
                 >
-                    <TextField required={true} label="Title" />
-                    <TextField required={true} label="Description" multiline rows={10} />
+                    <TextField required={true} label="Title" id="newItemNameField"/>
+                    <TextField required={true} label="Description" multiline rows={10} id="newItemDescField"/>
                 </Panel>
             </ListHeaderWrapper>
         </div >);

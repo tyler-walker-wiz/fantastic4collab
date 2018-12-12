@@ -70,7 +70,7 @@ namespace CS3750 {
             }
             async createItem(groupId: string, itemName: string, itemContents: string) {
                 if (this.chat) {
-                    let canUpdate = await this.chat.invoke("CreateItem", groupId, itemName, itemContents);
+                    let canUpdate = await this.chat.invoke("CreateItem", +groupId, itemName, itemContents);
                     return canUpdate;
                 }
                 return false;
