@@ -119,8 +119,6 @@ namespace fantastic4collab2.Hubs
         {
             currentConnections.Add(Context.ConnectionId);
 
-            Singleton singletonInstance = Singleton.Instance;
-
             Broadcast();
             return base.OnConnected();
         }

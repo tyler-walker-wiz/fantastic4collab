@@ -25,6 +25,14 @@ namespace fantastic4collab2.model
             Locked = false;
         }
 
+        public Item(int itemID, string title, string content)
+        {
+            ItemID = itemID;
+            Title = title;
+            Content = content;
+            Locked = false;
+        }
+
         public int ItemID { get; set; }
 
         public string Title { get; set; }

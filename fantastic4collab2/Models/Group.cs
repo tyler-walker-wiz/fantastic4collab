@@ -18,6 +18,12 @@ namespace fantastic4collab2.model
             Name = name;
         }
 
+        public Group(int groupID, string name)
+        {
+            GroupID = groupID;
+            Name = name;
+        }
+
         public string Name { get; set; }
 
         public int GroupID { get; set; }

@@ -33,18 +33,18 @@ namespace fantastic4collab2.Models
                 {
                     while (reader.Read())
                     {
-                        int groupID = reader.GetInt32(0);
+                        int? groupID = reader["groupid"] as int?;
                         string groupName = reader.GetString(1);
-                        int itemID = reader.GetInt32(2);
+                        int? itemID = reader["itemid"] as int?;
                         string itemTitle = reader.GetString(3);
                         string itemContent = reader.GetString(4);
 
-                        AddItem(new Group(groupName), new Item(itemTitle, itemContent));
+                        AddItem(new Group((int) groupID, groupName), new Item((int) itemID, itemTitle, itemContent));
                     }
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.StackTrace);
+                    throw e;
                 }
                 finally
                 {
@@ -126,18 +126,17 @@ namespace fantastic4collab2.Models
 
         public GroupItemPair[] getEverything()
         {
-            GroupItemPair[] returnArray = new GroupItemPair[itemCollection.Count];
-            int count = 0;
+            List<GroupItemPair> returnList = new List<GroupItemPair>();
 
             foreach (var group in itemCollection.Values)
             {
                 foreach (var item in group.items.Values)
                 {
-                    returnArray[count] = new GroupItemPair(item, group);
+                    returnList.Add(new GroupItemPair(item, group));
                 }
             }
 
-            return returnArray;
+            return returnList.ToArray();
         }
 
         public IDictionary<string, int> getLockedItems() {
