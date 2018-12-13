@@ -35,26 +35,56 @@ namespace fantastic4collab2.Services
         public static void Upsert(int groupId, Item item)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
-            int itemId = item.ItemID;
-            string content = item.Content;
-            string title = item.Title;
-
-            string UpsertString = "MERGE Item AS [Target] USING (SELECT @ItemId AS itemId, @Title AS title, @Content AS content, @GroupId AS GroupId) AS [Source] ON [Target].itemId = [Source].itemId WHEN MATCHED THEN UPDATE SET [Target].title = @Title, [Target].content = @Content WHEN NOT MATCHED THEN INSERT (Title, Content, GroupId) VALUES (@Title, @Content, 45); SET IDENTITY_INSERT Item OFF";
-            string GetIdString = "SELECT ItemId FROM Item WHERE GroupId = @GroupId AND Title = @Title;";
-
             sqlConnection.Open();
 
-            SqlCommand MyCommand = new SqlCommand(UpsertString) { Connection = sqlConnection };
-            SqlCommand SelectCommand = new SqlCommand(GetIdString) { Connection = sqlConnection };
-            SelectCommand.Parameters.AddWithValue("@GroupId", groupId);
-            SelectCommand.Parameters.AddWithValue("@Title", title);
-            MyCommand.Parameters.AddWithValue("@ItemId", itemId);
-            MyCommand.Parameters.AddWithValue("@GroupId", groupId);
-            MyCommand.Parameters.AddWithValue("@Title", title);
-            MyCommand.Parameters.AddWithValue("@Content", content);
-            MyCommand.ExecuteScalar();
+            SqlCommand cmd = sqlConnection.CreateCommand();
+            SqlTransaction transaction = sqlConnection.BeginTransaction();
+            cmd.Connection = sqlConnection;
+            cmd.Transaction = transaction;
 
-            item.ItemID = (int)SelectCommand.ExecuteScalar();
+            try
+            {
+                if (item.ItemID == null)
+                {
+                    cmd.CommandText = "INSERT INTO [Item] VALUES (@Title, @Content, @GroupID); SELECT SCOPE_IDENTITY()";
+
+                    cmd.Parameters.AddWithValue("@Title", item.Title);
+                    cmd.Parameters.AddWithValue("@Content", item.Content);
+                    cmd.Parameters.AddWithValue("@GroupID", groupId);
+
+                    Object ret = cmd.ExecuteScalar();
+                    item.ItemID = Convert.ToInt32(ret);
+                }
+                else
+                {
+                    cmd.CommandText = "UPDATE [Item] SET Title = @Title, Content = @Content WHERE ItemId = @ItemId AND GroupId = @GroupId";
+
+                    cmd.Parameters.AddWithValue("@Title", item.Title);
+                    cmd.Parameters.AddWithValue("@Content", item.Content);
+                    cmd.Parameters.AddWithValue("@ItemId", item.ItemID);
+                    cmd.Parameters.AddWithValue("@GroupId", groupId);
+
+                    cmd.ExecuteNonQuery();
+                }
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+
+                try
+                {
+                    transaction.Rollback();
+                }
+                catch (Exception ex2)
+                {
+
+                    throw ex2;
+                }
+                finally
+                {
+                    throw ex;
+                }
+            }
 
             sqlConnection.Close();
         }

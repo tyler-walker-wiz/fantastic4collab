@@ -9,7 +9,7 @@ namespace fantastic4collab2.Models
         {
             this.Name = item.Title;
             this.Content = item.Content;
-            this.Id = item.ItemID;
+            this.Id = (int) item.ItemID;
             this.Locked = item.Locked;
             this.GroupName = group.Name;
             this.GroupId = group.GroupID;

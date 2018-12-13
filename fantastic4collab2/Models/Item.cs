@@ -33,7 +33,7 @@ namespace fantastic4collab2.model
             Locked = false;
         }
 
-        public int ItemID { get; set; }
+        public int? ItemID { get; set; }
 
         public string Title { get; set; }
         

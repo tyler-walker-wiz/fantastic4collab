@@ -39,7 +39,7 @@ namespace fantastic4collab2.model
 
         public void AddItem(Item item)
         {
-            items.Add(item.ItemID, item);
+            items.Add((int) item.ItemID, item);
         }
 
         public Boolean Contains(int itemID)
