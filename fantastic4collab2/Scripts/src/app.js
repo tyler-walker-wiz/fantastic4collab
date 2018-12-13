@@ -131,7 +131,7 @@ var WorkItems = /** @class */ (function (_super) {
                         var _a = _this.state, header = _a.header, newItem = _a.newItem;
                         _this._onClosePanel();
                         if (header && newItem)
-                            _this.state.hub.createItem(header.id, newItem.id, newItem.content);
+                            _this.state.hub.createItem(header.id, newItem.name, newItem.content);
                     }, style: { marginRight: '8px' } }, "Save"),
                 React.createElement(Button_1.DefaultButton, { onClick: _this._onClosePanel }, "Cancel")));
         };

@@ -27,10 +27,10 @@ interface IWorkItemsState {
     headers: INavLink[];
     showPanel: boolean;
     header: INavLink;
-    newItem?: IWorkItem;
 }
 
 class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
+    private newItem = {} as IWorkItem;
     async handleLoad() {
         await setTimeout(() => { }, 1000);
         let hub = new HubHandler(this.onConnected, this.onReceive, "broadcastMessage", {
@@ -62,7 +62,8 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
         let headers = items.groupBy("groupId")
             .map(i => { let group = i[0]; return { id: group.id, key: group.groupId, onClick: (e, i) => this._selectHeader(i), name: group.groupName, url: "#" } as INavLink })
             .filter(i => !!i);
-        this.setState({ items, headers });
+        let header = headers && headers[0];
+        this.setState({ items, headers, header });
     }
     onItemChange = async (item: IWorkItem) => {
         return await this.state.hub.update(item.groupId, item.id, item.name, item.content);
@@ -111,10 +112,11 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
         return (
             <div>
                 <PrimaryButton onClick={() => {
-                    let { header, newItem } = this.state;
+                    let { header } = this.state;
                     this._onClosePanel();
-                    if (header && newItem)
-                        this.state.hub.createItem(header.id, newItem.id, newItem.content);
+                    if (header && this.newItem)
+                        this.state.hub.createItem(header.id, this.newItem && this.newItem.name, this.newItem && this.newItem.content);
+                    this.newItem = {} as IWorkItem;
                 }} style={{ marginRight: '8px' }}>
                     Save
         </PrimaryButton>
@@ -181,8 +183,8 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
                     closeButtonAriaLabel="Close"
                     onRenderFooterContent={this._onRenderFooterContent}
                 >
-                    <TextField required={true} label="Title" id="newItemNameField" />
-                    <TextField required={true} label="Description" multiline rows={10} id="newItemDescField" />
+                    <TextField required={true} label="Title" id="newItemNameField" onChange={(props, v) => { if (v) this.newItem.name = v }} />
+                    <TextField required={true} label="Description" multiline rows={10} id="newItemDescField" onChange={(props, v) => { if (v) this.newItem.content = v }} />
                 </Panel>
             </ListHeaderWrapper>
         </div >);
