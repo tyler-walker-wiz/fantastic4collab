@@ -61,9 +61,9 @@ namespace CS3750 {
                 }
                 return false;
             }
-            async unlockItem(itemID: string) {
+            async unlockItem(id: string) {
                 if (this.chat) {
-                    let canUpdate = await this.chat.invoke("UnlockItem", itemID);
+                    let canUpdate = await this.chat.invoke("UnlockItem", id);
                     return canUpdate;
                 }
                 return false;

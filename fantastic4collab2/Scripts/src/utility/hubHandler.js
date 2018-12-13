@@ -130,14 +130,14 @@ var CS3750;
                     });
                 });
             };
-            Hub.prototype.unlockItem = function (itemID) {
+            Hub.prototype.unlockItem = function (id) {
                 return __awaiter(this, void 0, void 0, function () {
                     var canUpdate;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
                                 if (!this.chat) return [3 /*break*/, 2];
-                                return [4 /*yield*/, this.chat.invoke("UnlockItem", itemID)];
+                                return [4 /*yield*/, this.chat.invoke("UnlockItem", id)];
                             case 1:
                                 canUpdate = _a.sent();
                                 return [2 /*return*/, canUpdate];

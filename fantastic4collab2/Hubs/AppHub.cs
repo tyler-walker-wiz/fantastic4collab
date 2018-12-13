@@ -64,12 +64,19 @@ namespace fantastic4collab2.Hubs
             Singleton thisInstance = Singleton.Instance;
             // Attempt to lock an item before beginning to edit, if lock fails reject edits
             // Once item is locked broadcast
-            if (!thisInstance.getLockedItems().ContainsKey(Context.ConnectionId) || !thisInstance.getLockedItems().Values.Contains(itemID))
+            var isLocked = thisInstance.getLockedItems().FirstOrDefault(i => i.Value == itemID);
+            if ((isLocked.Value == itemID && isLocked.Key == Context.ConnectionId) || isLocked.Value != itemID)
             {
-                thisInstance.addLockedItem(Context.ConnectionId, itemID);
-                Broadcast();
+                if (isLocked.Value != itemID)
+                {
+                    thisInstance.addLockedItem(Context.ConnectionId, itemID);
+                    Broadcast();
+                }
+
                 return true;
-            } else {
+            }
+            else
+            {
                 return false;
             }
         }
@@ -111,7 +118,8 @@ namespace fantastic4collab2.Hubs
             }
         }
 
-        public void update() {
+        public void update()
+        {
             Broadcast();
         }
 

@@ -76,11 +76,19 @@ var WorkItems = /** @class */ (function (_super) {
         };
         _this.retrieveInit = function (items) {
             console.log(JSON.stringify(items));
-            _this.setState({ items: items });
+            var headers = items.groupBy("groupId")
+                .map(function (i) { var group = i[0]; return { id: group.id, key: group.groupId, onClick: function (e, i) { return _this._selectHeader(i); }, name: group.groupName, url: "#" }; })
+                .filter(function (i) { return !!i; });
+            _this.setState({ items: items, headers: headers });
         };
-        _this.onItemChange = function (item) {
-            _this.state.hub.update(item.groupId, item.id, item.name, item.content);
-        };
+        _this.onItemChange = function (item) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.state.hub.update(item.groupId, item.id, item.name, item.content)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        }); };
         _this.dummyData = [{
                 id: "1",
                 name: "Item 1",
@@ -120,11 +128,31 @@ var WorkItems = /** @class */ (function (_super) {
         _this._onRenderFooterContent = function () {
             return (React.createElement("div", null,
                 React.createElement(Button_1.PrimaryButton, { onClick: function () {
-                        _this._onClosePanel;
-                        _this.state.hub.createItem("1", "Test name", "Test description");
+                        var _a = _this.state, header = _a.header, newItem = _a.newItem;
+                        _this._onClosePanel();
+                        if (header && newItem)
+                            _this.state.hub.createItem(header.id, newItem.id, newItem.content);
                     }, style: { marginRight: '8px' } }, "Save"),
                 React.createElement(Button_1.DefaultButton, { onClick: _this._onClosePanel }, "Cancel")));
         };
+        _this._selectHeader = function (header) {
+            if (header)
+                _this.setState({ header: header });
+        };
+        _this.onItemClose = function (item) {
+            _this.state.hub.unlockItem(item.id);
+        };
+        _this.onItemOpen = function (item) { return __awaiter(_this, void 0, void 0, function () {
+            var canEdit;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.state.hub.lockItem(item.id)];
+                    case 1:
+                        canEdit = _a.sent();
+                        return [2 /*return*/, canEdit];
+                }
+            });
+        }); };
         return _this;
     }
     WorkItems.prototype.handleLoad = function () {
@@ -135,7 +163,9 @@ var WorkItems = /** @class */ (function (_super) {
                     case 0: return [4 /*yield*/, setTimeout(function () { }, 1000)];
                     case 1:
                         _a.sent();
-                        hub = new hubHandler_1.HubHandler(this.onConnected, this.onReceive, "broadcastMessage", { "getEverything": this.retrieveInit });
+                        hub = new hubHandler_1.HubHandler(this.onConnected, this.onReceive, "broadcastMessage", {
+                            "getEverything": this.retrieveInit
+                        });
                         name = "tempName";
                         this.setState({ hub: hub, name: name, items: [] });
                         return [2 /*return*/];
@@ -162,18 +192,27 @@ var WorkItems = /** @class */ (function (_super) {
     };
     WorkItems.prototype.onRender = function () {
         var _this = this;
-        var _a = this.state, items = _a.items, headers = _a.headers;
+        var _a = this.state, items = _a.items, headers = _a.headers, header = _a.header, hub = _a.hub;
         if (!headers)
-            headers = [{ name: "Good one", onClick: function () { return alert("clicked"); }, url: "#" }];
+            headers = [{ name: "Good one", onClick: function (e, i) { return _this._selectHeader(i); }, url: "#", id: "2", key: "2" }];
+        if (!header)
+            header = headers[0];
+        if (header)
+            items = $.grep(items, function (i) { return i.groupId == header.key; });
         return (React.createElement("div", null,
             React.createElement("h2", { className: "ms-app-header" }, "Fantastic 4 Collab Workspace"),
             React.createElement("div", { className: "ms-Grid", dir: "ltr" },
                 React.createElement("div", { className: "col-Grid-row" })),
-            React.createElement(itemHeader_1.ListHeaderWrapper, { items: headers },
+            React.createElement(itemHeader_1.ListHeaderWrapper, { selected: header, items: headers },
                 React.createElement("div", { className: "ms-Grid", dir: "ltr" },
                     React.createElement("div", { className: "col-Grid-row" }, items.map(function (v, i) { return React.createElement("div", { key: i, className: "ms-Grid-col ms-sm3 ms-lg3" },
-                        React.createElement(workItem_1.WorkItem, { onChange: _this.onItemChange, locked: false, item: v })); }))),
-                React.createElement(Button_1.DefaultButton, { secondaryText: "Opens the Create Panel", text: "Add", onClick: this._onShowPanel, iconProps: { iconName: "Add" }, styles: { root: { float: "right", backgroundColor: "#0078d4", color: "white", position: "absolute", top: "50", right: "50" } } }),
+                        React.createElement(workItem_1.WorkItem, { onChange: _this.onItemChange, onClose: function () { return hub.unlockItem(v.id); }, checkCanEdit: function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4 /*yield*/, this.onItemOpen(v)];
+                                    case 1: return [2 /*return*/, _a.sent()];
+                                }
+                            }); }); }, item: v })); }))),
+                React.createElement(Button_1.DefaultButton, { secondaryText: "Opens the Create Panel", text: "Add", onClick: this._onShowPanel, iconProps: { iconName: "Add" }, styles: { root: { float: "right", backgroundColor: "#0078d4", color: "white", position: "fixed", top: "75", right: "50" } } }),
                 React.createElement(Panel_1.Panel, { isOpen: this.state.showPanel, type: Panel_1.PanelType.smallFixedFar, onDismiss: this._onClosePanel, headerText: "What would you like to say?", closeButtonAriaLabel: "Close", onRenderFooterContent: this._onRenderFooterContent },
                     React.createElement(TextField_1.TextField, { required: true, label: "Title", id: "newItemNameField" }),
                     React.createElement(TextField_1.TextField, { required: true, label: "Description", multiline: true, rows: 10, id: "newItemDescField" })))));

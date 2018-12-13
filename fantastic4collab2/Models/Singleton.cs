@@ -39,7 +39,7 @@ namespace fantastic4collab2.Models
                         string itemTitle = reader.GetString(3);
                         string itemContent = reader.GetString(4);
 
-                        AddItem(new Group((int) groupID, groupName), new Item((int) itemID, itemTitle, itemContent));
+                        AddItem(new Group((int)groupID, groupName), new Item((int)itemID, itemTitle, itemContent));
                     }
                 }
                 catch (Exception e)
@@ -59,11 +59,11 @@ namespace fantastic4collab2.Models
         {
             get
             {
-                if(instance == null)
+                if (instance == null)
                 {
                     lock (mutex)
                     {
-                        if(instance == null)
+                        if (instance == null)
                         {
                             instance = new Singleton();
                         }
@@ -139,29 +139,47 @@ namespace fantastic4collab2.Models
             return returnList.ToArray();
         }
 
-        public IDictionary<string, int> getLockedItems() {
+        public IDictionary<string, int> getLockedItems()
+        {
             return lockedItems;
         }
 
-        public void addLockedItem(string connectionId, int itemId) {
-            if (!lockedItems.ContainsKey(connectionId) || lockedItems.Values.Contains(itemId)) {
-                lock (mutex) {
+        public void addLockedItem(string connectionId, int itemId)
+        {
+            if (!lockedItems.ContainsKey(connectionId) || lockedItems.Values.Contains(itemId))
+            {
+                lock (mutex)
+                {
                     lockedItems.Add(connectionId, itemId);
+                    var group = itemCollection.FirstOrDefault(i => i.Value != null && i.Value.items.Count > 0 && i.Value.items.Values.Any(v => v.ItemID == itemId));
+                    if (group.Value != null)
+                    {
+                        var item = GetItem(group.Key, itemId);
+                        item.Locked = true;
+                    }
+
                 }
             }
         }
 
-        public void removeLockedItem(string connectionId, int itemId) {
+        public void removeLockedItem(string connectionId, int itemId)
+        {
             if (lockedItems.ContainsKey(connectionId) || lockedItems.Values.Contains(itemId))
             {
                 lock (mutex)
                 {
                     lockedItems.Remove(connectionId);
+                    var group = itemCollection.FirstOrDefault(i => i.Value != null && i.Value.items.Count > 0 && i.Value.items.Values.Any(v => v.ItemID == itemId));
+                    if (group.Value != null)
+                    {
+                        var item = GetItem(group.Key, itemId);
+                        item.Locked = false;
+                    }
                 }
             }
         }
 
-        public bool UpdateItem(int groupID, int itemID, string itemName, string itemContent)
+        public bool UpdateItem(int groupID, int itemID, string itemName, string itemContent, bool? locked = null)
         {
             Item theItem = GetItem(groupID, itemID);
 
@@ -169,6 +187,8 @@ namespace fantastic4collab2.Models
             {
                 theItem.Title = itemName;
                 theItem.Content = itemContent;
+                if (locked.HasValue)
+                    theItem.Locked = locked.GetValueOrDefault();
                 return true;
             }
 

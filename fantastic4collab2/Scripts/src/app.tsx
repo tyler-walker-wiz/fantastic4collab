@@ -33,7 +33,9 @@ interface IWorkItemsState {
 class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
     async handleLoad() {
         await setTimeout(() => { }, 1000);
-        let hub = new HubHandler(this.onConnected, this.onReceive, "broadcastMessage", { "getEverything": this.retrieveInit });
+        let hub = new HubHandler(this.onConnected, this.onReceive, "broadcastMessage", {
+            "getEverything": this.retrieveInit
+        });
         //let name = prompt("Enter name: ") as string;
         let name = "tempName";
         this.setState({ hub, name, items: [] });
@@ -62,8 +64,8 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
             .filter(i => !!i);
         this.setState({ items, headers });
     }
-    onItemChange = (item: IWorkItem) => {
-        this.state.hub.update(item.groupId, item.id, item.name, item.content);
+    onItemChange = async (item: IWorkItem) => {
+        return await this.state.hub.update(item.groupId, item.id, item.name, item.content);
     }
     dummyData: IWorkItem[] = [{
         id: "1",
@@ -125,8 +127,15 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
         if (header)
             this.setState({ header });
     }
+    onItemClose = (item: IWorkItem) => {
+        this.state.hub.unlockItem(item.id);
+    }
+    onItemOpen = async (item: IWorkItem) => {
+        let canEdit = await this.state.hub.lockItem(item.id);
+        return canEdit;
+    }
     onRender() {
-        let { items, headers, header } = this.state;
+        let { items, headers, header, hub } = this.state;
         if (!headers)
             headers = [{ name: "Good one", onClick: (e, i) => this._selectHeader(i), url: "#", id: "2", key: "2" }];
         if (!header)
@@ -160,10 +169,10 @@ class WorkItems extends BaseReactPageBasicHandleLoad<{}, IWorkItemsState>{
             <ListHeaderWrapper selected={header} items={headers}>
                 <div className="ms-Grid" dir="ltr">
                     <div className="col-Grid-row">
-                        {items.map((v, i) => <div key={i} className="ms-Grid-col ms-sm3 ms-lg3"><WorkItem onChange={this.onItemChange} locked={false} item={v} /></div>)}
+                        {items.map((v, i) => <div key={i} className="ms-Grid-col ms-sm3 ms-lg3"><WorkItem onChange={this.onItemChange} onClose={() => hub.unlockItem(v.id)} checkCanEdit={async () => await this.onItemOpen(v)} item={v} /></div>)}
                     </div>
                 </div>
-                <DefaultButton secondaryText="Opens the Create Panel" text="Add" onClick={this._onShowPanel} iconProps={{ iconName: "Add" }} styles={{ root: { float: "right", backgroundColor: "#0078d4", color: "white", position: "absolute", top: "50", right: "50" } }} />
+                <DefaultButton secondaryText="Opens the Create Panel" text="Add" onClick={this._onShowPanel} iconProps={{ iconName: "Add" }} styles={{ root: { float: "right", backgroundColor: "#0078d4", color: "white", position: "fixed", top: "75", right: "50" } }} />
                 <Panel
                     isOpen={this.state.showPanel}
                     type={PanelType.smallFixedFar}
