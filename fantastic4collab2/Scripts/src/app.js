@@ -71,6 +71,7 @@ var WorkItems = /** @class */ (function (_super) {
     __extends(WorkItems, _super);
     function WorkItems() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.newItem = {};
         _this.onConnected = function (e) {
             console.log("Connected!");
         };
@@ -79,7 +80,8 @@ var WorkItems = /** @class */ (function (_super) {
             var headers = items.groupBy("groupId")
                 .map(function (i) { var group = i[0]; return { id: group.id, key: group.groupId, onClick: function (e, i) { return _this._selectHeader(i); }, name: group.groupName, url: "#" }; })
                 .filter(function (i) { return !!i; });
-            _this.setState({ items: items, headers: headers });
+            var header = headers && headers[0];
+            _this.setState({ items: items, headers: headers, header: header });
         };
         _this.onItemChange = function (item) { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -128,10 +130,11 @@ var WorkItems = /** @class */ (function (_super) {
         _this._onRenderFooterContent = function () {
             return (React.createElement("div", null,
                 React.createElement(Button_1.PrimaryButton, { onClick: function () {
-                        var _a = _this.state, header = _a.header, newItem = _a.newItem;
+                        var header = _this.state.header;
                         _this._onClosePanel();
-                        if (header && newItem)
-                            _this.state.hub.createItem(header.id, newItem.name, newItem.content);
+                        if (header && _this.newItem)
+                            _this.state.hub.createItem(header.id, _this.newItem && _this.newItem.name, _this.newItem && _this.newItem.content);
+                        _this.newItem = {};
                     }, style: { marginRight: '8px' } }, "Save"),
                 React.createElement(Button_1.DefaultButton, { onClick: _this._onClosePanel }, "Cancel")));
         };
@@ -214,8 +217,10 @@ var WorkItems = /** @class */ (function (_super) {
                             }); }); }, item: v })); }))),
                 React.createElement(Button_1.DefaultButton, { secondaryText: "Opens the Create Panel", text: "Add", onClick: this._onShowPanel, iconProps: { iconName: "Add" }, styles: { root: { float: "right", backgroundColor: "#0078d4", color: "white", position: "fixed", top: "75", right: "50" } } }),
                 React.createElement(Panel_1.Panel, { isOpen: this.state.showPanel, type: Panel_1.PanelType.smallFixedFar, onDismiss: this._onClosePanel, headerText: "What would you like to say?", closeButtonAriaLabel: "Close", onRenderFooterContent: this._onRenderFooterContent },
-                    React.createElement(TextField_1.TextField, { required: true, label: "Title", id: "newItemNameField" }),
-                    React.createElement(TextField_1.TextField, { required: true, label: "Description", multiline: true, rows: 10, id: "newItemDescField" })))));
+                    React.createElement(TextField_1.TextField, { required: true, label: "Title", id: "newItemNameField", onChange: function (props, v) { if (v)
+                            _this.newItem.name = v; } }),
+                    React.createElement(TextField_1.TextField, { required: true, label: "Description", multiline: true, rows: 10, id: "newItemDescField", onChange: function (props, v) { if (v)
+                            _this.newItem.content = v; } })))));
     };
     return WorkItems;
 }(appBase_1.BaseReactPageBasicHandleLoad));

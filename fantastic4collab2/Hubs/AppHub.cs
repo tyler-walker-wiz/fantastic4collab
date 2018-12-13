@@ -133,6 +133,17 @@ namespace fantastic4collab2.Hubs
 
         public override Task OnDisconnected(bool stopCalled)
         {
+            Singleton thisInstance = Singleton.Instance;
+
+            if (thisInstance.getLockedItems().ContainsKey(Context.ConnectionId))
+            {
+                IDictionary<string, int> listOfItems = thisInstance.getLockedItems();
+                int itemToRemove = listOfItems[Context.ConnectionId];
+                this.UnlockItem(itemToRemove);
+                //thisInstance.removeLockedItem(Context.ConnectionId, itemToRemove); issue with this not returning true to reflect unlock state on client
+                Broadcast(); // not sure if this is necessary
+            }
+
             currentConnections.Remove(Context.ConnectionId);
             return base.OnDisconnected(stopCalled);
         }
